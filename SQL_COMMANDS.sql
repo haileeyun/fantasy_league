@@ -120,19 +120,19 @@ CREATE TABLE match_schedule (
 
 
 INSERT INTO user (user_ID, full_name, email, username, password, profile_settings) VALUES
-(10000001, 'Yatin Marpu', 'ymarpu@gmail.com', 'ymarpu', 'hashed_pw1', '{"theme": "dark"}'),
-(10000002, 'Hailee Yun', 'hyun@gmaill.com', 'hyun', 'hashed_pw2', '{"theme": "light"}'),
-(10000003, 'Jonas Dao', 'jdao@gmail.com', 'jdao', 'hashed_pw3', '{"theme": "dark"}'),
-(10000004, 'Salim Arfaoui', 'sarfaoui@gmail.com', 'sarfouai', 'hashed_pw4', '{"theme": "light"}'),
-(10000005, 'Dani Smolka', 'dsmolka@gmail.com', 'dsmolka', 'hashed_pw5', '{"theme": "dark"}'),
-(10000006, 'Ryan Wong', 'rwong@gmail.com', 'rwong', 'hashed_pw6', '{"theme": "light"}'),
-(10000007, 'Farabi Azad', 'fazad@gmail.com', 'fazad', 'hashed_pw7', '{"theme": "dark"}'),
-(10000008, 'Lorrie Savage', 'lsavage@gmail.com', 'lsavage', 'hashed_pw8', '{"theme": "light"}'),
-(10000009, 'Siam Huda', 'shuda@gmail.com', 'shuda', 'hashed_pw9', '{"theme": "dark"}'),
-(10000010, 'Haesun Uhm', 'huhm@gmail.com', 'huhm', 'hashed_pw10', '{"theme": "light"}');
+(10000001, 'Yatin Marpu', 'ymarpu@gmail.com', 'ymarpu', 'hashed_pw1', 'Notifications: On'),
+(10000002, 'Hailee Yun', 'hyun@gmaill.com', 'hyun', 'hashed_pw2', 'Notifications: On'),
+(10000003, 'Jonas Dao', 'jdao@gmail.com', 'jdao', 'hashed_pw3', 'Notifications: On'),
+(10000004, 'Salim Arfaoui', 'sarfaoui@gmail.com', 'sarfouai', 'hashed_pw4', 'Notifications: On'),
+(10000005, 'Dani Smolka', 'dsmolka@gmail.com', 'dsmolka', 'hashed_pw5', 'Notifications: On'),
+(10000006, 'Ryan Wong', 'rwong@gmail.com', 'rwong', 'hashed_pw6', 'Notifications: On'),
+(10000007, 'Farabi Azad', 'fazad@gmail.com', 'fazad', 'hashed_pw7', 'Notifications: On'),
+(10000008, 'Lorrie Savage', 'lsavage@gmail.com', 'lsavage', 'hashed_pw8', 'Notifications: On'),
+(10000009, 'Siam Huda', 'shuda@gmail.com', 'shuda', 'hashed_pw9', 'Notifications: On'),
+(10000010, 'Haesun Uhm', 'huhm@gmail.com', 'huhm', 'hashed_pw10', 'Notifications: On');
 
 INSERT INTO player (player_ID, full_name, sport, position, team, fantasy_points_scored, availability_status) VALUES
-(20000001, 'Justin Jefferson', 'FTB', 'WR', 'Vikings', 300.5, 'U'),
+(20000001, 'Justin Jefferson', 'FTB', 'WR', 'Vikings', 300.5, 'A'),
 (20000002, 'Tyreek Hill', 'FTB', 'WR', 'Dolphins', 250.0, 'A'),
 (20000003, 'James Connor', 'FTB', 'RB',  'Cardinals', 275.5, 'A'),
 (20000004, 'Saquon Barkley', 'FTB', 'RB', 'Eagles', 340.5, 'A'),
@@ -175,7 +175,7 @@ INSERT INTO player (player_ID, full_name, sport, position, team, fantasy_points_
 (20000046, 'Joe Mixon', 'FTB', 'RB', 'Bengals', 230.0, 'A'),
 (20000047, 'DK Metcalf', 'FTB', 'WR', 'Seahawks', 245.0, 'A'),
 (20000048, 'Michael Pittman Jr.', 'FTB', 'WR', 'Colts', 215.0, 'A'),
-(20000049, 'D\'Andre Swift', 'FTB', 'RB', 'Eagles', 240.0, 'A'),
+(20000049, 'Andre Swift', 'FTB', 'RB', 'Eagles', 240.0, 'A'),
 (20000050, 'Mike Evans', 'FTB', 'WR', 'Buccaneers', 260.0, 'A'),
 (20000051, 'Kyler Murray', 'FTB', 'QB', 'Cardinals', 295.0, 'A'),
 (20000052, 'Brian Robinson Jr.', 'FTB', 'RB', 'Commanders', 220.0, 'A'),
@@ -207,29 +207,29 @@ INSERT INTO team (team_ID, owner, league_ID, total_points_scored, league_ranking
 (40000009, 10000009, 30000001, 810.0, 1, 'Siam’s Team', 'A'),
 (40000010, 10000010, 30000001, 760.0, 2, 'Haesun’s Team', 'A');
 
-INSERT INTO trade (trade_ID, trade_date) VALUES
-(5000000001, '2024-11-01'),
-(5000000002, '2024-11-02'),
-(5000000003, '2024-11-03'),
-(5000000004, '2024-11-04'),
-(5000000005, '2024-11-05'),
-(5000000006, '2024-11-06'),
-(5000000007, '2024-11-07'),
-(5000000008, '2024-11-08'),
-(5000000009, '2024-11-09'),
-(5000000010, '2024-11-10');
+INSERT INTO trade (trade_ID, trade_date, status, proposer, accepter) VALUES
+(5000000001, '2024-11-01', 'Accepted', 40000001, 40000002),
+(5000000002, '2024-11-02', 'Accepted', 40000003, 40000002),
+(5000000003, '2024-11-03', 'Rejected', 40000002, 40000005),
+(5000000004, '2024-11-04', 'Accepted', 40000005, 40000002),
+(5000000005, '2024-11-05', 'Rejected', 40000002, 40000005),
+(5000000006, '2024-11-06', 'Rejected', 40000005, 40000002),
+(5000000007, '2024-11-07', 'Rejected', 40000001, 40000002),
+(5000000008, '2024-11-08', 'Rejected', 40000001, 40000002),
+(5000000009, '2024-11-09', 'Accepted', 40000002, 40000001),
+(5000000010, '2024-11-10', 'Accepted', 40000002, 40000003);
 
-INSERT INTO traded_players (trade_ID, player_ID) VALUES
-(5000000001, 20000001),
-(5000000001, 20000002),
-(5000000002, 20000003),
-(5000000002, 20000004),
-(5000000003, 20000005),
-(5000000003, 20000006),
-(5000000004, 20000007),
-(5000000004, 20000008),
-(5000000005, 20000009),
-(5000000005, 20000010);
+INSERT INTO traded_players (trade_ID, player_ID, original_team_ID) VALUES
+(5000000001, 20000004, 40000001),
+(5000000001, 20000006, 40000002),
+(5000000002, 20000004, 40000002),
+(5000000002, 20000012, 40000003),
+(5000000003, 20000014, 40000005),
+(5000000003, 20000018, 40000002),
+(5000000004, 20000014, 40000005),
+(5000000004, 20000018, 40000002),
+(5000000005, 20000014, 40000002),
+(5000000005, 20000018, 40000005);
 
 INSERT INTO trading_teams (trade_ID, team_ID) VALUES
 (5000000001, 40000001),
@@ -245,15 +245,15 @@ INSERT INTO trading_teams (trade_ID, team_ID) VALUES
 
 INSERT INTO game_match (match_ID, match_date, final_score, winner) VALUES
 (60000001, '2024-10-01', '28-21', 40000001),
-(60000002, '2024-10-02', '35-30', 40000002),
-(60000003, '2024-10-03', '14-20', 40000004),
-(60000004, '2024-10-04', '22-18', 40000004),
-(60000005, '2024-10-05', '17-24', 40000006),
+(60000002, '2024-10-02', '35-30', 40000003),
+(60000003, '2024-10-03', '14-20', 40000005),
+(60000004, '2024-10-04', '22-18', 40000007),
+(60000005, '2024-10-05', '17-24', 400000010),
 (60000006, '2024-10-06', '27-27', NULL),
-(60000007, '2024-10-07', '32-28', 40000007),
-(60000008, '2024-10-08', '40-38', 40000008),
+(60000007, '2024-10-07', '32-28', 40000002),
+(60000008, '2024-10-08', '40-38', 40000004),
 (60000009, '2024-10-09', '21-15', 40000009),
-(60000010, '2024-10-10', '18-22', 40000001);
+(60000010, '2024-10-10', '18-22', 40000006);
 
 INSERT INTO match_event (match_event_ID, player_ID, match_ID, event_type, event_time, fantasy_points) VALUES
 (7000000001, 20000001, 60000001, 'Touchdown', '01:05:30', 6.0),
