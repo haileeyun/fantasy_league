@@ -1,136 +1,123 @@
-
 DROP TABLE IF EXISTS user;
 CREATE TABLE user (
-	user_ID NUMERIC(8),
-	full_name VARCHAR(50), 
-	email VARCHAR(50) UNIQUE NOT NULL, 
-	username VARCHAR(20) UNIQUE NOT NULL,
-	password VARCHAR(64) NOT NULL,
-	profile_settings VARCHAR(64),
-	PRIMARY KEY(user_ID)
+    user_ID INTEGER PRIMARY KEY,
+    full_name VARCHAR(50),
+    email VARCHAR(50) UNIQUE NOT NULL,
+    username VARCHAR(20) UNIQUE NOT NULL,
+    password VARCHAR(64) NOT NULL,
+    profile_settings VARCHAR(64),
+    admin BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE player (
-    player_ID NUMERIC(8),
-    full_name VARCHAR(50),
-    sport CHAR(3),
-    position CHAR(3),
-    team VARCHAR(50),
-    fantasy_points_scored NUMERIC(6),
-    availability_status CHAR(1),
-    PRIMARY KEY(player_ID)
-	);
+    player_ID NUMERIC(8) PRIMARY KEY,
+    full_name VARCHAR(50) NOT NULL,
+    sport CHAR(3) NOT NULL,
+    position CHAR(3) NOT NULL,
+    team VARCHAR(50) NOT NULL,
+    fantasy_points_scored NUMERIC(6) DEFAULT 0,
+    availability_status CHAR(1) DEFAULT 'A'
+);
 
 CREATE TABLE league (
-	league_ID NUMERIC(8),
-	league_name VARCHAR(30) NOT NULL,
-	league_type CHAR(1) DEFAULT 'U',
-	commissioner VARCHAR(20),
-	FOREIGN KEY (commissioner) REFERENCES user(username),
-	max_teams INT NOT NULL DEFAULT 10,
-	draft_date DATE,
-	PRIMARY KEY(league_ID)
+    league_ID NUMERIC(8) PRIMARY KEY,
+    league_name VARCHAR(30) NOT NULL,
+    league_type CHAR(1) DEFAULT 'U',
+    commissioner VARCHAR(20) NOT NULL,
+    FOREIGN KEY (commissioner) REFERENCES user(username),
+    max_teams INTEGER DEFAULT 10 NOT NULL,
+    draft_date DATE
 );
 
 CREATE TABLE team (
-    team_ID NUMERIC(8) PRIMARY KEY,
-    owner NUMERIC(8),
+    team_ID INTEGER PRIMARY KEY,
+    team_name VARCHAR(50) NOT NULL,
     league_ID NUMERIC(8),
-    total_points_scored NUMERIC(6),
-    league_ranking NUMERIC(3),
-    team_name VARCHAR(25),
-    status CHAR(1),
-    FOREIGN KEY (owner) REFERENCES user(user_ID),
-    FOREIGN KEY (league_ID) REFERENCES league(league_ID)
+    owner INTEGER NOT NULL,
+    status CHAR(1) NOT NULL,
+    total_points_scored INTEGER DEFAULT 0,
+    league_ranking INTEGER,
+    FOREIGN KEY (league_ID) REFERENCES league(league_ID),
+    FOREIGN KEY (owner) REFERENCES user(user_ID)
 );
 
-
-CREATE TABLE trade (
-    trade_ID NUMERIC(10) PRIMARY KEY,
-    trade_date DATE
+CREATE TABLE player_statistic (
+    statistic_ID NUMERIC(10) PRIMARY KEY,
+    player_ID NUMERIC(8) NOT NULL,
+    game_date DATE NOT NULL,
+    performance_stats TEXT,
+    injury_status CHAR(1) DEFAULT 'N',
+    FOREIGN KEY (player_ID) REFERENCES player(player_ID)
 );
-
-
 
 CREATE TABLE drafts (
-	draft_ID NUMERIC(8),
-	league_ID NUMERIC(8),
-	player_ID NUMERIC(8),
-	FOREIGN KEY (league_ID) REFERENCES league(league_ID),
-	FOREIGN KEY (player_ID) REFERENCES player(player_ID),
-	draft_date DATE,
-	draft_order CHAR(1), 
-	draft_status CHAR(1),
-	PRIMARY KEY(draft_ID)
+    draft_ID NUMERIC(8) PRIMARY KEY,
+    league_ID NUMERIC(8) NOT NULL,
+    team_ID INTEGER NOT NULL,
+    player_ID NUMERIC(8) NOT NULL,
+    draft_date DATE,
+    draft_order CHAR(1),
+    draft_status CHAR(1),
+    FOREIGN KEY (league_ID) REFERENCES league(league_ID),
+    FOREIGN KEY (team_ID) REFERENCES team(team_ID),
+    FOREIGN KEY (player_ID) REFERENCES player(player_ID)
+);
+
+CREATE TABLE trade (
+    trade_ID INTEGER PRIMARY KEY,
+    trade_date DATE NOT NULL,
+    status VARCHAR(64),
+    proposer INTEGER NOT NULL,
+    accepter INTEGER NOT NULL,
+    FOREIGN KEY (proposer) REFERENCES team(team_ID),
+    FOREIGN KEY (accepter) REFERENCES team(team_ID)
 );
 
 CREATE TABLE traded_players (
-	trade_ID NUMERIC(10),
-	player_ID NUMERIC(8),
-	FOREIGN KEY(trade_ID) REFERENCES trade(trade_ID),
-	FOREIGN KEY(player_ID) REFERENCES player(player_ID),
-	PRIMARY KEY (trade_ID, player_ID)
+    trade_ID INTEGER,
+    player_ID NUMERIC(8),
+    original_team_ID INTEGER NOT NULL,
+    PRIMARY KEY (trade_ID, player_ID),
+    FOREIGN KEY (trade_ID) REFERENCES trade(trade_ID),
+    FOREIGN KEY (player_ID) REFERENCES player(player_ID),
+    FOREIGN KEY (original_team_ID) REFERENCES team(team_ID)
+);
+
+CREATE TABLE trading_teams (
+    trade_ID INTEGER,
+    team_ID INTEGER,
+    PRIMARY KEY (trade_ID, team_ID),
+    FOREIGN KEY (trade_ID) REFERENCES trade(trade_ID),
+    FOREIGN KEY (team_ID) REFERENCES team(team_ID)
 );
 
 CREATE TABLE game_match (
     match_ID NUMERIC(8) PRIMARY KEY,
     match_date DATE,
     final_score VARCHAR(10),
-    winner NUMERIC(8)
-);
-
-
-CREATE TABLE player_statistic (
-    statistic_ID NUMERIC(10),  
-    player_ID NUMERIC(8), 
-    game_date DATE,
-    performance_stats TEXT,  
-    injury_status CHAR(1) DEFAULT 'N',
-    PRIMARY KEY (statistic_ID),
-    FOREIGN KEY (player_ID) REFERENCES player(player_ID) 
-);
-
-
-CREATE TABLE waiver (
-    waiver_ID NUMERIC(8),
-    team_ID NUMERIC(8),
-    player_ID NUMERIC(8),
-    waiver_order INT(3),
-    waiver_status CHAR(1) DEFAULT 'P',
-    waiver_pick_up_date DATE,
-    PRIMARY KEY (waiver_ID),
-    FOREIGN KEY (team_ID) REFERENCES team(team_ID),
-    FOREIGN KEY (player_ID) REFERENCES player(player_ID)
+    winner NUMERIC(8),
+    FOREIGN KEY (winner) REFERENCES team(team_ID)
 );
 
 CREATE TABLE match_event (
-    match_event_ID NUMERIC(10),
-    player_ID NUMERIC(8) REFERENCES player(player_ID),
-    match_ID NUMERIC(8) REFERENCES game_match(match_ID),
+    match_event_ID NUMERIC(10) PRIMARY KEY,
+    player_ID NUMERIC(8),
+    match_ID NUMERIC(8),
     event_type VARCHAR(20),
     event_time TIME,
     fantasy_points NUMERIC(6),
-    PRIMARY KEY(match_event_ID)
+    FOREIGN KEY (player_ID) REFERENCES player(player_ID),
+    FOREIGN KEY (match_ID) REFERENCES game_match(match_ID)
 );
-
 
 CREATE TABLE match_schedule (
-   match_ID NUMERIC(8),
-   team_ID NUMERIC(8),
-   PRIMARY KEY (match_ID, team_ID),
-   FOREIGN KEY (team_ID) REFERENCES team(team_ID),
-   FOREIGN KEY (match_ID) REFERENCES game_match(match_ID)
+    match_ID NUMERIC(8),
+    team_ID INTEGER,
+    PRIMARY KEY (match_ID, team_ID),
+    FOREIGN KEY (match_ID) REFERENCES game_match(match_ID),
+    FOREIGN KEY (team_ID) REFERENCES team(team_ID)
 );
 
-
-CREATE TABLE trading_teams (
-   trade_ID NUMERIC(10),
-   team_ID NUMERIC(8),
-   FOREIGN KEY (team_ID) REFERENCES team(team_ID),
-   FOREIGN KEY (trade_ID) REFERENCES trade(trade_ID),
-   PRIMARY KEY (trade_ID, team_ID)
-
-);
 
 INSERT INTO user (user_ID, full_name, email, username, password, profile_settings) VALUES
 (10000001, 'Yatin Marpu', 'ymarpu@gmail.com', 'ymarpu', 'hashed_pw1', '{"theme": "dark"}'),
@@ -164,7 +151,37 @@ INSERT INTO player (player_ID, full_name, sport, position, team, fantasy_points_
 (20000017, 'Derrick Henry', 'FTB', 'RB', 'Ravens', 250.0, 'A'),
 (20000018, 'Keenan Allen', 'FTB', 'WR', 'Bears', 230.0, 'A'),
 (20000019, 'Jayden Daniels', 'FTB', 'QB', 'Commanders', 395.0, 'A'),
-(20000020, 'Allen Lazard', 'FTB', 'WR', 'Jets', 100.0, 'A');
+(20000020, 'Allen Lazard', 'FTB', 'WR', 'Jets', 100.0, 'A'),
+(20000026, 'Christian McCaffrey', 'FTB', 'RB', '49ers', 350.0, 'A'),
+(20000027, 'Davante Adams', 'FTB', 'WR', 'Raiders', 275.0, 'A'),
+(20000028, 'Stefon Diggs', 'FTB', 'WR', 'Bills', 260.0, 'A'),
+(20000029, 'Josh Allen', 'FTB', 'QB', 'Bills', 320.0, 'A'),
+(20000030, 'Tyler Lockett', 'FTB', 'WR', 'Seahawks', 220.0, 'A'),
+(20000031, 'Austin Ekeler', 'FTB', 'RB', 'Chargers', 340.0, 'A'),
+(20000032, 'Lamar Jackson', 'FTB', 'QB', 'Ravens', 310.0, 'A'),
+(20000033, 'CeeDee Lamb', 'FTB', 'WR', 'Cowboys', 280.0, 'A'),
+(20000034, 'Tony Pollard', 'FTB', 'RB', 'Cowboys', 270.0, 'A'),
+(20000035, 'Amon-Ra St. Brown', 'FTB', 'WR', 'Lions', 265.0, 'A'),
+(20000036, 'Deebo Samuel', 'FTB', 'WR', '49ers', 250.0, 'A'),
+(20000037, 'Tua Tagovailoa', 'FTB', 'QB', 'Dolphins', 295.0, 'A'),
+(20000038, 'Nick Chubb', 'FTB', 'RB', 'Browns', 320.0, 'A'),
+(20000039, 'Cooper Kupp', 'FTB', 'WR', 'Rams', 280.0, 'A'),
+(20000040, 'Trevor Lawrence', 'FTB', 'QB', 'Jaguars', 305.0, 'A'),
+(20000041, 'Kenneth Walker III', 'FTB', 'RB', 'Seahawks', 265.0, 'A'),
+(20000042, 'Chris Godwin', 'FTB', 'WR', 'Buccaneers', 210.0, 'A'),
+(20000043, 'Najee Harris', 'FTB', 'RB', 'Steelers', 240.0, 'A'),
+(20000044, 'Garrett Wilson', 'FTB', 'WR', 'Jets', 250.0, 'A'),
+(20000045, 'Justin Fields', 'FTB', 'QB', 'Bears', 300.0, 'A'),
+(20000046, 'Joe Mixon', 'FTB', 'RB', 'Bengals', 230.0, 'A'),
+(20000047, 'DK Metcalf', 'FTB', 'WR', 'Seahawks', 245.0, 'A'),
+(20000048, 'Michael Pittman Jr.', 'FTB', 'WR', 'Colts', 215.0, 'A'),
+(20000049, 'D\'Andre Swift', 'FTB', 'RB', 'Eagles', 240.0, 'A'),
+(20000050, 'Mike Evans', 'FTB', 'WR', 'Buccaneers', 260.0, 'A'),
+(20000051, 'Kyler Murray', 'FTB', 'QB', 'Cardinals', 295.0, 'A'),
+(20000052, 'Brian Robinson Jr.', 'FTB', 'RB', 'Commanders', 220.0, 'A'),
+(20000053, 'Terry McLaurin', 'FTB', 'WR', 'Commanders', 230.0, 'A'),
+(20000054, 'Breece Hall', 'FTB', 'RB', 'Jets', 250.0, 'A'),
+(20000055, 'Zay Flowers', 'FTB', 'WR', 'Ravens', 210.0, 'A');
 
 INSERT INTO league (league_ID, league_name, league_type, commissioner, max_teams, draft_date) VALUES
 (30000001, 'Yatin’s League', 'U', 'ymarpu', 10, '2024-08-21'),
@@ -318,8 +335,8 @@ INSERT INTO player_statistic (statistic_ID, player_ID, game_date, performance_st
 
 
 SELECT * FROM user;
-SELECT full_name 
-FROM player 
+SELECT full_name
+FROM player
 WHERE position = ‘QB’;
 
 SELECT *
@@ -367,9 +384,3 @@ CREATE PROCEDURE available_players()
 BEGIN
     SELECT *
     FROM player
-    WHERE availability_status = 'A';
-END $$
-
-DELIMITER ;
-
-CALL available_players();
